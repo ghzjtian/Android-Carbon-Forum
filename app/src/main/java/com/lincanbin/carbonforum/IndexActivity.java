@@ -19,6 +19,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.lincanbin.carbonforum.adapter.TopicAdapter;
@@ -51,11 +52,13 @@ import java.util.Map;
 
 //http://stackoverflow.com/questions/28150100/setsupportactionbar-throws-error/28150167
 public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+
+    private static final String TAG = IndexActivity.class.getSimpleName();
     private Toolbar mToolbar;
     //save our header or result
     private AccountHeader headerResult = null;
     private Drawer mDrawer = null;
-    private RecyclerView mRecyclerView ;
+    private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton mFloatingActionButton;
     private TopicAdapter mAdapter;
@@ -64,7 +67,9 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
     private int currentPage = 0;
     private int totalPage = 65536;
     private Boolean enableScrollListener = true;
-    private List<Map<String,Object>> topicList = new ArrayList<>();
+    private List<Map<String, Object>> topicList = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +114,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         mRecyclerView = (RecyclerView) findViewById(R.id.topic_list);
         //使RecyclerView保持固定的大小，这样会提高RecyclerView的性能
         mRecyclerView.setHasFixedSize(true);
+
         // 创建一个线性布局管理器
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         //setOnScrollListener已废弃，使用addOnScrollListener需要在使用后用clearOnScrollListeners()移除监听器
@@ -153,15 +159,19 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         //Activity渲染完毕时加载帖子，使用缓存
         loadTopic(1, true);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRefreshDrawerBroadcastReceiver);
     }
+
     //加载帖子列表
     private void loadTopic(int targetPage, Boolean enableCache) {
+        Log.i(TAG,"loadTopic:"+targetPage+" "+enableCache);
         new GetTopicsTask(targetPage, enableCache).execute();
     }
+
     // broadcast receiver
     private BroadcastReceiver mRefreshDrawerBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -172,10 +182,11 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
             }
         }
     };
-    private void refreshDrawer(Bundle savedInstanceState){
-        try{
+
+    private void refreshDrawer(Bundle savedInstanceState) {
+        try {
             //Log.v("UserID", mSharedPreferences.getString("UserID", "0"));
-            if(!CarbonForumApplication.isLoggedIn()){ //未登录
+            if (!CarbonForumApplication.isLoggedIn()) { //未登录
                 //隐藏发帖按钮
                 mFloatingActionButton.setVisibility(View.INVISIBLE);
                 final IProfile profile = new ProfileDrawerItem()
@@ -192,7 +203,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                         )
                         .withSavedInstance(savedInstanceState)
                         .build();
-            }else{ //已登录
+            } else { //已登录
                 //显示发帖按钮
                 mFloatingActionButton.setVisibility(View.VISIBLE);
                 final IProfile profile = new ProfileDrawerItem()
@@ -205,7 +216,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                         .withActivity(this)
                         .withHeaderBackground(R.drawable.header)
                         .withSelectionListEnabledForSingleProfile(false)
-                                //.withTranslucentStatusBar(false)
+                        //.withTranslucentStatusBar(false)
                         .addProfiles(
                                 profile,
                                 //don't ask but google uses 14dp for the add account icon in gmail but 20dp for the normal icons (like manage account)
@@ -249,7 +260,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                 .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .withSavedInstance(savedInstanceState)
                 .withShowDrawerOnFirstLaunch(true)
-                        // .withTranslucentStatusBar(false)
+                // .withTranslucentStatusBar(false)
                 .addDrawerItems(
                         new PrimaryDrawerItem().
                                 withName(R.string.app_name).
@@ -295,7 +306,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                 });
 
 
-        if(!CarbonForumApplication.isLoggedIn()) { //未登录
+        if (!CarbonForumApplication.isLoggedIn()) { //未登录
             mDrawerBuilder.addDrawerItems(
                     new PrimaryDrawerItem().
                             withName(R.string.title_activity_login).
@@ -308,7 +319,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                             withIdentifier(4).
                             withSelectable(false)
             );
-        }else{ //已登录
+        } else { //已登录
             mDrawerBuilder.addDrawerItems(
                     new PrimaryDrawerItem()
                             .withName(R.string.title_activity_notifications)
@@ -338,12 +349,13 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         }
         //TODO:根据消息数量刷新Notification
         int notificationsNumber = Integer.parseInt(CarbonForumApplication.cacheSharedPreferences.getString("notificationsNumber", "0"));
-        if(notificationsNumber>0){
+        if (notificationsNumber > 0) {
             //添加消息通知
             mDrawer.updateBadge(4, new StringHolder(notificationsNumber + ""));
         }
 
     }
+
     //下拉刷新事件
     @Override
     public void onRefresh() {
@@ -351,6 +363,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         loadTopic(1, false);
         //}
     }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -362,6 +375,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
     }
+
     @Override
     public void onBackPressed() {
         //handle the back press :D close the drawer first and if the drawer is closed close the activity
@@ -371,30 +385,35 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
             super.onBackPressed();
         }
     }
-    public class GetTopicsTask extends AsyncTask<Void, Void, List<Map<String,Object>>> {
+
+    public class GetTopicsTask extends AsyncTask<Void, Void, List<Map<String, Object>>> {
         private int targetPage;
         private Boolean enableCache;
         private int positionStart;
+
         public GetTopicsTask(int targetPage, Boolean enableCache) {
             this.targetPage = targetPage;
             this.enableCache = enableCache;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.i(TAG,"onPreExecute");
+
             enableScrollListener = false;
-            if(enableCache){
+            if (enableCache) {
                 topicList = JSONUtil.jsonObject2List(JSONUtil.jsonString2Object(
                         CarbonForumApplication.cacheSharedPreferences.getString("topicsCache", "{\"Status\":1, \"TopicsArray\":[]}"))
                         , "TopicsArray");
-                if(topicList != null){
+                if (topicList != null) {
                     mAdapter.setData(topicList);
                     mAdapter.notifyDataSetChanged();
                 }
             }
-            mSwipeRefreshLayout.post(new Runnable(){
+            mSwipeRefreshLayout.post(new Runnable() {
                 @Override
-                public void run(){
+                public void run() {
                     mSwipeRefreshLayout.setRefreshing(true);
                 }
             });
@@ -406,7 +425,9 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
         @Override
         protected void onPostExecute(List<Map<String, Object>> result) {
             super.onPostExecute(result);
-            if(result!=null && !result.isEmpty()) {
+            Log.i(TAG,"onPostExecute:"+(result!=null?result.toString():"null"));
+
+            if (result != null && !result.isEmpty()) {
                 if (targetPage > 1) {
                     positionStart = topicList.size() - 1;
                     topicList.addAll(result);
@@ -421,7 +442,7 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
                 }
                 //更新当前页数
                 currentPage = targetPage;
-            }else{
+            } else {
                 Snackbar.make(mFloatingActionButton, R.string.network_error, Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
             //移除刷新控件
@@ -432,27 +453,31 @@ public class IndexActivity extends AppCompatActivity implements SwipeRefreshLayo
 
         @Override
         protected List<Map<String, Object>> doInBackground(Void... params) {
-            List<Map<String,Object>> list;
+            Log.i(TAG,"doInBackground1:"+params.toString());
+
+            List<Map<String, Object>> list;
             JSONObject jsonObject = HttpUtil.postRequest(IndexActivity.this, APIAddress.HOME_URL(targetPage), null, false, false);
             //Log.v("JSON", str);
-            if(jsonObject != null){
+            if (jsonObject != null) {
                 try {
                     totalPage = jsonObject.getInt("TotalPage");
-                }catch(JSONException e){
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(targetPage == 1){
+                if (targetPage == 1) {
                     try {
                         SharedPreferences.Editor cacheEditor = CarbonForumApplication.cacheSharedPreferences.edit();
                         cacheEditor.putString("topicsCache", jsonObject.toString(0));
                         cacheEditor.apply();
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
             list = JSONUtil.jsonObject2List(jsonObject, "TopicsArray");
-            //Log.v("List", list.toString());
+
+
+            Log.v("doInBackground2 List",(list==null?"null": list.toString()));
             return list;
         }
 

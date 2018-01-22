@@ -38,6 +38,7 @@ public class TopicAdapter extends RecyclerView.Adapter{
     }
 
     private static final String TAG = TopicAdapter.class.getSimpleName();
+
     private List<Map<String,Object>> list;
     public TopicAdapter(Context context){
         this.context = context;
@@ -94,6 +95,8 @@ public class TopicAdapter extends RecyclerView.Adapter{
             rootView.setOnClickListener(this);
             rootView.setOnLongClickListener(this);
         }
+
+
         @Override
         //点击事件
         public void onClick(View v) {

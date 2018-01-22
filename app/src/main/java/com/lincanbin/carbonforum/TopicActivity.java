@@ -58,7 +58,8 @@ public class TopicActivity extends AppCompatActivity implements SwipeRefreshLayo
         //取出Intent中附加的数据
         mTopic = mIntent.getStringExtra("Topic");
         mTopicID = mIntent.getStringExtra("TopicID");
-        mTopicPage = mIntent.getStringExtra("TargetPage");
+        mTopicPage = mIntent.getStringExtra("TargetPage");//1
+
         setContentView(R.layout.activity_topic);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -84,7 +85,8 @@ public class TopicActivity extends AppCompatActivity implements SwipeRefreshLayo
         mRecyclerView = (RecyclerView) findViewById(R.id.post_list);
         mRecyclerView.setHasFixedSize(true);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {//滑动到底部，自动加载下一页的数据
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {

@@ -182,7 +182,11 @@ public class HttpUtil {
             }
             */
             String tempLine = null;
+
+            //java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+            //https://developer.android.com/training/articles/security-ssl.html?hl=zh-cn#Concepts
             OutputStream outputStream = httpURLConnection.getOutputStream();
+
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);//现在通过输出流对象构建对象输出流对象，以实现输出可序列化的对象。
             outputStreamWriter.write(parameterString);// 向对象输出流写出数据，这些数据将存到内存缓冲区中
             outputStreamWriter.flush();// 刷新对象输出流，将任何字节都写入潜在的流中（些处为ObjectOutputStream）

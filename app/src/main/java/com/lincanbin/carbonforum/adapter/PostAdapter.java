@@ -103,10 +103,10 @@ public class PostAdapter extends RecyclerView.Adapter{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ReplyActivity.class);
-                intent.putExtra("TopicID", post.get("TopicID").toString());
-                intent.putExtra("PostID", post.get("ID").toString());
-                intent.putExtra("PostFloor", post.get("PostFloor").toString());
-                intent.putExtra("UserName", post.get("UserName").toString());
+                intent.putExtra("TopicID", post.get("TopicID").toString());//文章的 ID
+                intent.putExtra("PostID", post.get("ID").toString());   //post 的 ID 号(包括 文章和回复的数据库 ID)
+                intent.putExtra("PostFloor", post.get("PostFloor").toString());//文章回复的第几楼
+                intent.putExtra("UserName", post.get("UserName").toString());//发送这个 文章/回复 的人的名字
                 intent.putExtra("DefaultContent", "");
                 context.startActivity(intent);
             }
